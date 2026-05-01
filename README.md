@@ -263,8 +263,8 @@ This project is built for **educational and research purposes only**. It is not 
 BE — Artificial Intelligence & Data Science
 Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/yourprofile)
-[![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat-square&logo=github)](https://github.com/yourusername)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/charan-sai-8b0a42283)
+[![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat-square&logo=github)](https://github.com/charansai-1411)
 
 ---
 

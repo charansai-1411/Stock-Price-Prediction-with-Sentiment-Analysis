@@ -268,10 +268,4 @@ Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad
 
 ---
 
-## 📄 License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-*Part of a two-project AI/ML portfolio built for UBS campus recruitment — combining financial domain knowledge with production-grade machine learning.*

@@ -45,9 +45,7 @@ else:
 
 @st.cache_data(ttl=3600)
 def load_data(ticker, period):
-    session = requests.Session()
-    session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
-    df = yf.Ticker(ticker, session=session).history(period=period)
+    df = yf.Ticker(ticker).history(period=period)
     df.reset_index(inplace=True)
     df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)
     return df[["Date", "Open", "High", "Low", "Close", "Volume"]]

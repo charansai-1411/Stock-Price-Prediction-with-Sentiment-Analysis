@@ -1,0 +1,10 @@
+streamlit
+yfinance
+pandas
+numpy
+plotly
+vaderSentiment
+prophet
+ta
+newsapi-python
+praw

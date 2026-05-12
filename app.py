@@ -1,4 +1,5 @@
 import os
+import requests
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -44,7 +45,9 @@ else:
 
 @st.cache_data(ttl=3600)
 def load_data(ticker, period):
-    df = yf.Ticker(ticker).history(period=period)
+    session = requests.Session()
+    session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+    df = yf.Ticker(ticker, session=session).history(period=period)
     df.reset_index(inplace=True)
     df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)
     return df[["Date", "Open", "High", "Low", "Close", "Volume"]]
@@ -145,7 +148,6 @@ with st.spinner(f"Loading {ticker} data..."):
         df   = add_indicators(raw)
         sent = get_sentiment(ticker, df, news_api_key, reddit_client_id, reddit_client_secret)
         df["sentiment"] = sent["sentiment"].values
-        info = yf.Ticker(ticker).info
     except Exception as e:
         st.error(f"Error loading data: {e}")
         st.stop()

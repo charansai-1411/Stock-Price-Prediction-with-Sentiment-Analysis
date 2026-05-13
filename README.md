@@ -46,14 +46,14 @@ Stock prices are influenced by two forces: **historical price patterns** and **m
               ▼                                        ▼
    Yahoo Finance (yfinance)                     NewsAPI
    ├── OHLCV daily data                  ├── Financial news headlines
-   ├── 6mo / 1y / 2y / 5y history       ├── Last 30 days
+   ├── 6mo / 1y / 2y / 5y history        ├── Last 30 days
    └── Retry + fallback on rate limits   └── Company name query
               │                                        │
               ▼                                        ▼
    Technical Indicators                    Sentiment Pipeline
    ├── MA 7 / MA 21                        ├── VADER polarity scoring
    ├── RSI (14-day)                        ├── Daily aggregation
-   ├── MACD (EMA 12/26)                   └── Date-aligned merge
+   ├── MACD (EMA 12/26)                    └── Date-aligned merge
    └── Bollinger Bands (20-day)
               │                                        │
               └──────────────┬─────────────────────────┘

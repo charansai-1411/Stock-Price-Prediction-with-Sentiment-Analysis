@@ -5,6 +5,4 @@ numpy
 plotly
 vaderSentiment
 prophet
-ta
 newsapi-python
-praw

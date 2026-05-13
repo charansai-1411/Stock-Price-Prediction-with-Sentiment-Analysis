@@ -1,35 +1,37 @@
 # 📈 Stock Price Prediction with Sentiment Analysis
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square&logo=python)
-![LSTM](https://img.shields.io/badge/Model-LSTM%20%7C%20Prophet-purple?style=flat-square)
-![FinBERT](https://img.shields.io/badge/NLP-FinBERT%20%7C%20VADER-yellow?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.11+-blue?style=flat-square&logo=python)
+![Model](https://img.shields.io/badge/Model-Prophet-purple?style=flat-square)
+![NLP](https://img.shields.io/badge/NLP-VADER%20%7C%20NewsAPI-yellow?style=flat-square)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red?style=flat-square&logo=streamlit)
-![Yahoo Finance](https://img.shields.io/badge/Data-Yahoo%20Finance%20%7C%20Reddit-informational?style=flat-square)
+![Data](https://img.shields.io/badge/Data-Yahoo%20Finance%20%7C%20NewsAPI-informational?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square)
 
-> A multimodal stock price prediction system combining LSTM-based time series forecasting with real-time financial sentiment analysis from Reddit (r/stocks) and news headlines — deployed as an interactive Streamlit dashboard.
+> An interactive stock price analysis and forecasting dashboard combining **Prophet time-series forecasting**, **technical indicators**, and **real-time news sentiment analysis** via NewsAPI + VADER — deployed as a Streamlit web application.
 
 ---
 
 ## 📌 Problem Statement
 
-Stock prices are influenced by two forces: **historical price patterns** and **market sentiment**. Most models use only one. This project fuses both:
+Stock prices are influenced by two forces: **historical price patterns** and **market sentiment**. This project fuses both into one interactive dashboard:
 
-- **Quantitative signal:** LSTM trained on OHLCV data from Yahoo Finance
-- **Sentiment signal:** FinBERT + VADER scores from Reddit r/stocks and financial news
-- **Result:** A hybrid prediction model that captures both technical and psychological market dynamics
+- **Quantitative signal:** Technical indicators (RSI, MACD, Bollinger Bands, Moving Averages) computed on OHLCV data from Yahoo Finance
+- **Sentiment signal:** VADER sentiment scores applied to live financial news headlines from NewsAPI
+- **Forecast:** Prophet time-series model producing a configurable day-ahead price forecast with confidence intervals
 
 ---
 
-## 🎯 Results
+## 🎯 Features
 
-| Model | MAE | RMSE | MAPE | Sentiment Feature Impact |
-|-------|-----|------|------|--------------------------|
-| LSTM (price only) | 4.21 | 6.83 | 2.14% | — |
-| LSTM + Sentiment | **3.47** | **5.62** | **1.89%** | ↓ 17.5% MAE improvement |
-| Prophet Baseline | 5.10 | 7.94 | 2.67% | — |
-
-> Adding sentiment as a feature reduced MAE by **17.5%** — confirming that market psychology carries measurable predictive signal beyond price history alone.
+| Feature | Details |
+|---|---|
+| 📊 Live Price Data | Fetches OHLCV data from Yahoo Finance with retry + fallback logic |
+| 📈 Technical Indicators | RSI (14), MACD, Bollinger Bands, MA 7 & MA 21 |
+| 🔮 Prophet Forecast | Configurable 7–90 day forecast with uncertainty bands |
+| 🗣️ Sentiment Analysis | NewsAPI headlines → VADER compound score per day |
+| 🏢 30 Stock Tickers | Dropdown of popular companies + custom ticker input |
+| 🌑 Dark UI | Dark-themed Plotly charts with candlestick, RSI, MACD views |
+| 💾 Caching | 1-hour Streamlit cache on all data/model calls |
 
 ---
 
@@ -42,81 +44,77 @@ Stock prices are influenced by two forces: **historical price patterns** and **m
                            │              │
               ┌────────────┘              └────────────┐
               ▼                                        ▼
-   Yahoo Finance (yfinance)               Reddit r/stocks + NewsAPI
-   ├── OHLCV daily data                  ├── Post titles & comments
-   ├── 5 years historical                ├── Financial news headlines
-   └── Real-time price feed              └── Last 30 days rolling window
+   Yahoo Finance (yfinance)                     NewsAPI
+   ├── OHLCV daily data                  ├── Financial news headlines
+   ├── 6mo / 1y / 2y / 5y history       ├── Last 30 days
+   └── Retry + fallback on rate limits   └── Company name query
               │                                        │
               ▼                                        ▼
-   Price Preprocessing                   Sentiment Pipeline
-   ├── MinMaxScaler                       ├── VADER (lexicon-based, fast)
-   ├── Sequence windowing (60 days)       ├── FinBERT (transformer, accurate)
-   └── Train/Test split (80/20)          └── Daily aggregated sentiment score
+   Technical Indicators                    Sentiment Pipeline
+   ├── MA 7 / MA 21                        ├── VADER polarity scoring
+   ├── RSI (14-day)                        ├── Daily aggregation
+   ├── MACD (EMA 12/26)                   └── Date-aligned merge
+   └── Bollinger Bands (20-day)
               │                                        │
               └──────────────┬─────────────────────────┘
                              ▼
-                   Feature Matrix
-                   [price_seq | sentiment_score | volume]
+                   Feature DataFrame
+                   [OHLCV | Indicators | Sentiment Score]
                              │
                              ▼
-                   LSTM Model (Keras)
-                   ├── 2x LSTM layers (50 units)
-                   ├── Dropout (0.2)
-                   └── Dense output layer
-                             │
-                             ▼
-                   Predictions + Confidence Band
+                   Prophet Forecasting
+                   ├── Weekly + Yearly seasonality
+                   ├── Configurable forecast horizon (7–90 days)
+                   └── yhat + confidence interval (yhat_upper / yhat_lower)
                              │
                              ▼
                    Streamlit Dashboard
-                   ├── Ticker search
-                   ├── Price forecast chart
-                   ├── Live sentiment gauge
-                   └── Recent news with sentiment tags
+                   ├── Ticker dropdown (29 companies + custom)
+                   ├── Candlestick + indicator charts
+                   ├── Prophet forecast chart
+                   ├── Sentiment bar chart + 7-day rolling average
+                   └── Raw data table
 ```
 
 ---
 
-## 📊 Key Visualizations
+## 📊 Dashboard Tabs
 
-### Price Prediction vs Actual
-> LSTM with sentiment features tracks price movements more accurately, especially around high-volatility news events.
+### 📈 Price & Indicators
+- **Candlestick chart** with MA 7, MA 21, and Bollinger Bands overlay
+- **RSI (14)** with overbought (70) / oversold (30) reference lines
+- **MACD** line chart
 
-![Price Prediction](assets/price_prediction.png)
+### 🔮 Prophet Forecast
+- Historical price overlaid with Prophet's forecast line
+- Shaded confidence interval band
+- Forecast summary: predicted price + range for the selected horizon
 
-### Sentiment Score Timeline
-> Daily FinBERT sentiment scores (Reddit + News) plotted against price — shows leading indicator behavior before major moves.
+### 🗣️ Sentiment
+- Daily bar chart of VADER compound scores (–1 to +1), color-coded red → yellow → green
+- 7-day rolling average sentiment line chart
 
-![Sentiment Timeline](assets/sentiment_timeline.png)
-
-### Feature Correlation Heatmap
-> Sentiment score shows statistically significant correlation with next-day price direction.
-
-![Correlation Heatmap](assets/correlation_heatmap.png)
-
-### Streamlit Dashboard
-> Live ticker search, forecast chart, sentiment gauge, and tagged news feed in a single interface.
-
-![Dashboard](assets/dashboard.png)
+### 📋 Raw Data
+- Full DataFrame with all computed columns, sorted by most recent date
 
 ---
 
 ## 🧠 Key Technical Decisions
 
-**Why FinBERT over VADER alone?**
-VADER is a general-purpose lexicon — it misinterprets financial language. "Bearish outlook" scores neutral in VADER but negative in FinBERT, which was fine-tuned on 10,000+ financial news sentences. Used FinBERT for accuracy, VADER as a fast fallback when API limits are hit.
+**Why VADER over FinBERT?**
+VADER is lightweight, runs entirely offline, and requires no GPU or API quota. For a live dashboard that processes 100 headlines per request, it gives near-instant results. FinBERT would add meaningful accuracy but requires transformer inference — not suitable for a free-tier deployment.
 
-**Why Reddit r/stocks over Bloomberg/paid APIs?**
-Free, real-time, and reflects retail investor sentiment — a genuine market-moving force post-2020. Scraped using PRAW (Reddit API). Filtered by post score > 10 to remove noise.
+**Why NewsAPI over Reddit (PRAW)?**
+NewsAPI provides structured, clean financial headlines with timestamps via a simple REST call. Reddit scraping via PRAW requires OAuth credentials and is rate-limited more aggressively; it also returns noisier, less finance-specific content.
 
-**Why LSTM over ARIMA?**
-LSTM captures non-linear temporal dependencies and multi-feature inputs. ARIMA is univariate and linear. For a sentiment-augmented model, LSTM is the only viable choice.
+**Why Prophet over LSTM?**
+Prophet runs in seconds without GPU, handles missing data and seasonality automatically, and requires no data normalization or sequence windowing. For a dashboard where a user wants a forecast on any of 29 tickers instantly, Prophet is the right tool.
 
-**Why 60-day sequence window?**
-Backtested 30, 60, 90-day windows. 60 days offered the best tradeoff between capturing medium-term trends and avoiding vanishing gradient issues in longer sequences.
+**Why retry + fallback for Yahoo Finance?**
+Yahoo Finance's free API is rate-limited per IP. The app uses `yf.Ticker().history()` first, retries 3× with exponential back-off (1s → 2s → 4s), then falls back to `yf.download()` — a different code path that often bypasses the rate limit.
 
-**Why Prophet as baseline?**
-Facebook Prophet handles seasonality, holidays, and missing data automatically — strong baseline that quantifies how much LSTM + sentiment actually adds.
+**Why mock sentiment as fallback?**
+If the NewsAPI key is missing or the request fails, the app generates deterministic mock sentiment scores derived from the stock's own daily returns + controlled noise. This keeps the dashboard fully functional for demo purposes without any API key.
 
 ---
 
@@ -124,112 +122,69 @@ Facebook Prophet handles seasonality, holidays, and missing data automatically �
 
 ### Prerequisites
 ```bash
-pip install yfinance praw vaderSentiment transformers torch \
-            keras tensorflow streamlit pandas numpy \
-            matplotlib seaborn scikit-learn prophet newsapi-python
+pip install -r requirements.txt
 ```
 
-### API Keys Required
-Create a `.env` file:
-```
-REDDIT_CLIENT_ID=your_reddit_client_id
-REDDIT_CLIENT_SECRET=your_reddit_client_secret
-REDDIT_USER_AGENT=stock_sentiment_bot
-NEWS_API_KEY=your_newsapi_key        # newsapi.org — free tier
+### API Key Setup
+Create `.streamlit/secrets.toml` in the project root:
+```toml
+NEWS_API_KEY = "your_newsapi_key"   # free tier at newsapi.org
 ```
 
-### Run the Notebook
+Or set it as an environment variable:
 ```bash
-# Full pipeline: data → sentiment → model → evaluation
-stock_prediction.ipynb
+export NEWS_API_KEY=your_newsapi_key
 ```
 
-### Run the Streamlit Dashboard
+> **No API key?** The dashboard still works — it uses mock sentiment data derived from price returns as a fallback.
+
+### Run the Dashboard
 ```bash
-git clone https://github.com/yourusername/stock-sentiment-predictor
-cd stock-sentiment-predictor
+git clone https://github.com/charansai-1411/Stock-Price-Prediction-with-Sentiment-Analysis
+cd Stock-Price-Prediction-with-Sentiment-Analysis
 streamlit run app.py
 ```
 
-Enter any ticker (AAPL, TSLA, RELIANCE.NS) to get live predictions.
+Open [http://localhost:8501](http://localhost:8501) in your browser.
 
 ---
 
 ## 📁 Project Structure
 
 ```
-stock-sentiment-predictor/
-├── stock_prediction.ipynb        # Full ML pipeline notebook
-├── app.py                        # Streamlit dashboard
-├── src/
-│   ├── data_fetcher.py           # Yahoo Finance + Reddit scraper
-│   ├── sentiment_pipeline.py     # VADER + FinBERT scoring
-│   ├── preprocessor.py           # Scaling, windowing, feature engineering
-│   ├── lstm_model.py             # LSTM architecture + training
-│   └── prophet_baseline.py       # Prophet baseline model
-├── models/
-│   ├── lstm_model.h5             # Trained LSTM weights
-│   └── scaler.pkl                # Fitted MinMaxScaler
-├── data/
-│   └── sample_AAPL.csv           # Sample dataset for offline demo
-├── assets/
-│   ├── price_prediction.png
-│   ├── sentiment_timeline.png
-│   ├── correlation_heatmap.png
-│   └── dashboard.png
-├── .env.example                  # API key template
-├── requirements.txt
+Stock-Price-Prediction-with-Sentiment-Analysis/
+├── app.py                        # Streamlit dashboard (single-file app)
+├── Stock_Price_Analysis.ipynb    # Exploratory ML pipeline notebook
+├── requirements.txt              # Python dependencies
+├── .streamlit/
+│   └── secrets.toml              # API keys (not committed to Git)
+├── .gitignore
 └── README.md
 ```
 
 ---
 
-## 🔬 Model Pipeline
+## 🛠️ Tech Stack
 
-```python
-# Pipeline summary
-1. Data Collection
-   ├── yfinance → 5yr OHLCV data for target ticker
-   └── PRAW + NewsAPI → last 30 days headlines & Reddit posts
-
-2. Sentiment Scoring
-   ├── Clean text (remove URLs, special chars)
-   ├── VADER → polarity score (-1 to +1)
-   ├── FinBERT → positive/negative/neutral probability
-   └── Daily aggregation → weighted sentiment score
-
-3. Feature Engineering
-   ├── Align sentiment scores with price dates
-   ├── Technical indicators: RSI, 20-day MA, Volume delta
-   └── Sequence construction: 60-day rolling windows
-
-4. LSTM Training
-   ├── Architecture: LSTM(50) → Dropout(0.2) → LSTM(50) → Dense(1)
-   ├── Loss: MSE | Optimizer: Adam | Epochs: 50
-   └── Early stopping (patience=5)
-
-5. Evaluation
-   ├── MAE, RMSE, MAPE on test set
-   └── Ablation: price-only vs price+sentiment
-
-6. Streamlit Dashboard
-   ├── Live ticker input
-   ├── 30-day forecast with confidence band
-   ├── Sentiment gauge (current market mood)
-   └── Recent news feed with FinBERT sentiment tags
-```
+| Tool | Purpose |
+|------|---------|
+| `yfinance` | Stock OHLCV data (Yahoo Finance) |
+| `NewsAPI` (`newsapi-python`) | Financial news headlines |
+| `vaderSentiment` | Lexicon-based sentiment scoring |
+| `Prophet` | Time-series price forecasting |
+| `Streamlit` | Interactive web dashboard |
+| `Plotly` | Interactive charts (candlestick, RSI, MACD) |
+| `Pandas / NumPy` | Data manipulation & indicator computation |
 
 ---
 
-## 💡 Business Insight
+## ⚙️ Configuration Options
 
-**Sentiment as a leading indicator:**
-Analysis across 6 months of AAPL data showed that a sentiment score shift of > 0.3 (positive or negative) preceded a price move of > 1.5% within 2 trading days in **68% of cases** — suggesting sentiment carries genuine short-term predictive value beyond noise.
-
-**Practical application:**
-- Trading desks use sentiment to complement quantitative signals
-- Risk teams monitor Reddit/social sentiment as an early warning system
-- Retail trading apps surface sentiment scores alongside price charts
+| Sidebar Control | Options | Default |
+|---|---|---|
+| Stock Ticker | Dropdown of 29 companies + custom input | Apple (AAPL) |
+| History Period | 6mo / 1y / 2y / 5y | 1y |
+| Forecast Days | 7 – 90 days (slider) | 30 |
 
 ---
 
@@ -239,33 +194,11 @@ This project is built for **educational and research purposes only**. It is not 
 
 ---
 
-## 🛠️ Tech Stack
-
-| Tool | Purpose |
-|------|---------|
-| yfinance | Stock price data (Yahoo Finance) |
-| PRAW | Reddit scraping (r/stocks) |
-| NewsAPI | Financial news headlines |
-| VADER | Fast lexicon-based sentiment |
-| FinBERT | Finance-domain transformer sentiment |
-| Keras / TensorFlow | LSTM model |
-| Prophet | Baseline forecasting model |
-| Scikit-learn | Preprocessing, evaluation metrics |
-| Streamlit | Interactive dashboard |
-| Pandas / NumPy | Data manipulation |
-| Matplotlib / Seaborn | Visualizations |
-
----
-
 ## 👤 Author
 
-**Y. Charan Sai**
-BE — Artificial Intelligence & Data Science
+**Y. Charan Sai**  
+BE — Artificial Intelligence & Data Science  
 Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/charan-sai-8b0a42283)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat-square&logo=github)](https://github.com/charansai-1411)
-
----
-
-
